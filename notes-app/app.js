@@ -19,7 +19,6 @@ yargs.command({
     },
   },
   handler: function ({ title, content }) {
-    console.log(chalk.blue.inverse('Adding a new note!'));
     notes.add(title, content);
   },
 });
@@ -29,8 +28,15 @@ yargs.command({
 yargs.command({
   command: 'remove',
   describe: 'Remove a note',
-  handler: function () {
-    console.log(chalk.yellow.inverse('Removing a note!'));
+  builder: {
+    title: {
+      describe: 'Note title',
+      demandOption: true,
+      type: 'string',
+    },
+  },
+  handler: function ({ title }) {
+    notes.remove(title);
   },
 });
 
