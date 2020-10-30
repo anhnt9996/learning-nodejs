@@ -18,7 +18,7 @@ yargs.command({
       type: 'string',
     },
   },
-  handler: function ({ title, content }) {
+  handler({ title, content }) {
     notes.add(title, content);
   },
 });
@@ -35,7 +35,7 @@ yargs.command({
       type: 'string',
     },
   },
-  handler: function ({ title }) {
+  handler({ title }) {
     notes.remove(title);
   },
 });
@@ -45,8 +45,8 @@ yargs.command({
 yargs.command({
   command: 'list',
   describe: 'List your notes',
-  handler: function () {
-    console.log(chalk.green.inverse('Listing out all notes!'));
+  handler() {
+    notes.list();
   },
 });
 
@@ -55,8 +55,15 @@ yargs.command({
 yargs.command({
   command: 'read',
   describe: 'Read a note',
-  handler: function () {
-    console.log(chalk.green.inverse('Reading a note!'));
+  builder: {
+    title: {
+      describe: 'Note title',
+      demandOption: true,
+      type: 'string',
+    },
+  },
+  handler({ title }) {
+    notes.show(title);
   },
 });
 
