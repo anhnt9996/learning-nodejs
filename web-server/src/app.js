@@ -5,11 +5,16 @@ const path = require('path');
 const geocoding = require('./geocoding');
 const forecast = require('./forecast');
 
+const app = express();
+
+// Settings
+
+app.disable('etag');
+
 // Default variables
 const PORT = 3000;
 const ROOTDIR = path.join(__dirname, '../');
 
-const app = express();
 app.use(express.static(path.join(ROOTDIR, '/public')));
 
 // View engine
@@ -23,14 +28,26 @@ const viewConfig = (options) => {
 // Routes
 
 app.get('', (req, res) => {
+  res.render('index');
+});
+
+app.get('/weather', (req, res) => {
   const { address } = req.query;
+
   if (!address) {
     return res.send({
-      error: 'Address is required',
+      error: true,
+      message: 'Address is required',
     });
   }
 
   geocoding.search(address, (response) => {
+    res.status(200);
+
+    if (response.error) {
+      return res.send(response);
+    }
+
     const { result: location, placeName } = response;
 
     forecast.get(location, (response) => {

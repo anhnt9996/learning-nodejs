@@ -14,6 +14,13 @@ const search = (searchText, callback) => {
   };
 
   request(options, (error, res, body) => {
+    if (!body.features[0]) {
+      return callback({
+        error: true,
+        message: 'Unable to find location!',
+      });
+    }
+
     const location = body.features[0].center;
     const result = `${location[1]},${location[0]}`;
 

@@ -41,3 +41,10 @@ body {
   color: white;
   text-align: center;
 }
+
+#spinner {
+  display: none;
+  position: absolute;
+  bottom: -14px;
+  width: 40px;
+}
