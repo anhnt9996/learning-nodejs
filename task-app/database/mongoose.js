@@ -9,13 +9,5 @@ const ENV = {
 mongoose.connect(`mongodb://${ENV.dbHost}:${ENV.dbPort}/${ENV.dbName}`, {
   useNewUrlParser: true,
   useCreateIndex: true,
-});
-
-const User = mongoose.model('User', {
-  name: {
-    type: String,
-  },
-  age: {
-    type: Number,
-  },
+  useFindAndModify: false,
 });
