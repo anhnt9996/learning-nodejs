@@ -1,20 +1,16 @@
 const express = require('express');
 
 require('./database/mongoose');
-const apiRouter = require('./routes/api');
-const taskRouter = require('./routes/api/task');
+const { config } = require('./app/lib/helper');
 
-const ENV = {
-  API_VERSION: 1,
-  PORT: 3000,
-};
+const apiRouter = require('./routes/api');
 
 const app = express();
-const PORT = process.env.PORT || ENV.PORT;
+const PORT = 3000;
 
 app.use(express.json());
 
 // Router
-app.use(`/api/v${ENV.API_VERSION}/tasks`, taskRouter);
+app.use(`/api/v${config('app.apiVersion')}`, apiRouter);
 
-app.listen(PORT, () => console.log(`Listening on port ${PORT}`));
+app.listen(PORT, () => console.log(`Listening on port ${config('app.port')}`));

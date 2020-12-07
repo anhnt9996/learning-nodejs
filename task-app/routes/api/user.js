@@ -1,7 +1,9 @@
 const express = require('express');
 const router = express.Router();
 
-require('../../app/lib/helper');
+const { response, responseError } = require('../../app/lib/helper');
+const Obj = require('../../app/Helpers/Obj');
+
 const User = require('../../app/Models/User');
 
 router.get('/', async (req, res) => {
@@ -40,6 +42,20 @@ router.post('/', async (req, res) => {
   } catch (error) {
     res.status(422).json(responseError(422, error.message));
   }
+});
+
+router.put('/:id', async (req, res) => {
+  const { id } = req.params;
+
+  const user = await User.findById(id);
+
+  if (!user) {
+    return res.status(404).json(responseError(404, `Cannot find user #${id}`));
+  }
+
+  const updates = Obj.only(req.body, ['name']);
+
+  res.json(response({ id: user.id, name: user.name }));
 });
 
 module.exports = router;
