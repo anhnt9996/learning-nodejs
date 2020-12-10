@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcryptjs');
+const argon2 = require('argon2');
 
 const { response, responseError, config } = require('../../app/lib/helper');
 const Obj = require('../../app/Helpers/Obj');

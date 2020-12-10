@@ -1,26 +1,33 @@
 const express = require('express');
 
-require('./database/mongoose');
-const { config, responseError } = require('./app/lib/helper');
+const bootstrap = require('./bootstrap/app');
+const db = require('./database/mongoose');
 
+const { config, responseError } = require('./app/lib/helper');
 const apiRouter = require('./routes/api');
 
-const app = express();
-const PORT = 3000;
+(async () => {
+  await bootstrap.init();
+  await db.init();
 
-app.use((req, res, next) => {
-  const maintenanceMode = process.env.NODE_MAINTENANCE_MODE || 'off';
+  const PORT = config('app.port');
 
-  if (maintenanceMode === 'on') {
-    return res.status(503).json(responseError(503, 'Under maintenance!'));
-  }
+  const app = express();
 
-  next();
-});
+  app.use((req, res, next) => {
+    const maintenanceMode = process.env.NODE_MAINTENANCE_MODE || 'off';
 
-app.use(express.json());
+    if (maintenanceMode === 'on') {
+      return res.status(503).json(responseError(503, 'Under maintenance!'));
+    }
 
-// Router
-app.use(`/api/v${config('app.apiVersion')}`, apiRouter);
+    next();
+  });
 
-app.listen(PORT, () => console.log(`Listening on port ${config('app.port')}`));
+  app.use(express.json());
+
+  // Router
+  app.use(`/api/v${config('app.apiVersion')}`, apiRouter);
+
+  app.listen(PORT, () => console.log(`Listening on port ${PORT}`));
+})();

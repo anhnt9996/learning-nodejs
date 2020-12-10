@@ -1,3 +1,5 @@
+const bootstrap = require('../../bootstrap/app');
+
 exports.response = (data, code = 200, message = '') => {
   return {
     code,
@@ -42,10 +44,10 @@ exports.config = (key) => {
 
     const explodeKey = key.split('.');
 
-    const path = explodeKey.slice(0, 1);
+    const path = explodeKey[0];
     const keys = explodeKey.slice(1);
 
-    const config = require(`../../config/${path}`);
+    const config = bootstrap.getConfig(path);
 
     if (keys.length <= 0) {
       return config;
