@@ -19,6 +19,25 @@ class Obj {
 
     return result;
   }
+
+  static except(object, keys) {
+    if (empty(object) || empty(keys)) {
+      return {};
+    }
+
+    if (typeof keys === 'string') {
+      delete object[keys];
+      return object;
+    }
+
+    keys.forEach((key) => {
+      if (object[key]) {
+        delete object[key];
+      }
+    });
+
+    return object;
+  }
 }
 
 module.exports = Obj;

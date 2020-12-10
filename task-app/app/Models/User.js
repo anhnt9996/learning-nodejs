@@ -3,6 +3,7 @@ const validator = require('validator');
 const bcrypt = require('bcryptjs');
 
 const { config } = require('../lib/helper');
+const JwtService = require('../Services/JwtService');
 
 const userSchema = new mongoose.Schema({
   username: {
@@ -19,7 +20,6 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
     trim: true,
-    minlength: 7,
     validate(value) {
       if (validator.contains(value, 'password')) {
         throw new Error('Password must not contain "password!');
@@ -29,14 +29,37 @@ const userSchema = new mongoose.Schema({
 });
 
 userSchema.pre('save', async function (next) {
-  const user = this;
-
-  if (user.isModified('password')) {
-    user.password = await bcrypt.hash('password', config('app.salt'));
+  if (this.isModified('password')) {
+    this.password = await bcrypt.hash(this.password, config('app.salt'));
   }
 
   next();
 });
+
+userSchema.statics.findByCredentials = async function (
+  username,
+  password = ''
+) {
+  const user = await this.findOne({ username });
+  if (!user) {
+    return;
+  }
+
+  if (!bcrypt.compareSync(password.toString(), user.password)) {
+    return;
+  }
+
+  return user;
+};
+
+userSchema.methods.token = function () {
+  const payload = {
+    id: this._id.toString(),
+    name: this.name,
+  };
+
+  return JwtService.generate(payload, 'secret');
+};
 
 const User = mongoose.model('User', userSchema);
 
