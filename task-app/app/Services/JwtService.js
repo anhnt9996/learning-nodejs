@@ -6,8 +6,12 @@ const Obj = require('../Helpers/Obj');
 class JwtService {
   static generate(payload, secret, options = {}) {
     options.expiresIn = config('jwt.expiresIn');
-
-    return jwt.sign(payload, secret, options);
+    const token = jwt.sign(payload, secret, options);
+    const decode = jwt.decode(token);
+    return {
+      token,
+      exp: decode.exp * 1000,
+    };
   }
 
   static verify(token, secret, getPayload = false) {
@@ -21,6 +25,16 @@ class JwtService {
       return true;
     } catch (error) {
       return false;
+    }
+  }
+
+  static decode(token, payload = false) {
+    try {
+      const decodedToken = jwt.decode(token, { complete: payload });
+
+      return decodedToken;
+    } catch (error) {
+      return null;
     }
   }
 }

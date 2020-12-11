@@ -6,13 +6,13 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "npm index.js",
-    "dev": "nodemon index.js"
+    "dev": "nodemon index.js",
+    "maintenance": "NODE_MAINTENANCE_MODE=on nodemon index.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "argon2": "^0.27.0",
     "bcryptjs": "^2.4.3",
     "express": "^4.17.1",
     "glob": "^7.1.6",

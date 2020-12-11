@@ -64,9 +64,25 @@ exports.empty = (value) => {
     return true;
   }
 
+  if (typeof value === 'object' && Object.keys(value).length === 0) {
+    return true;
+  }
+
   if (Array.isArray(value) && value.length <= 0) {
     return true;
   }
 
   return false;
+};
+
+exports.randString = (length = 6) => {
+  let result = '';
+  const characters =
+    'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+
+  for (let i = 0; i < length; i++) {
+    result += characters.charAt(Math.floor(Math.random() * characters.length));
+  }
+
+  return result;
 };

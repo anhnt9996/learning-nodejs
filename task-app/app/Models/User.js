@@ -4,6 +4,7 @@ const bcrypt = require('bcryptjs');
 
 const { config } = require('../lib/helper');
 const JwtService = require('../Services/JwtService');
+const Client = require('./Client');
 
 const userSchema = new mongoose.Schema({
   username: {
@@ -30,7 +31,7 @@ const userSchema = new mongoose.Schema({
 
 userSchema.pre('save', async function (next) {
   if (this.isModified('password')) {
-    this.password = await bcrypt.hash(this.password, config('app.salt'));
+    this.password = await bcrypt.hash(this.password, config('app.saltLength'));
   }
 
   next();
@@ -45,20 +46,22 @@ userSchema.statics.findByCredentials = async function (
     return;
   }
 
-  if (!bcrypt.compareSync(password.toString(), user.password)) {
+  if (!(await bcrypt.compare(password.toString(), user.password))) {
     return;
   }
 
   return user;
 };
 
-userSchema.methods.token = function () {
+userSchema.methods.token = async function () {
   const payload = {
-    id: this._id.toString(),
+    userId: this._id.toString(),
     name: this.name,
   };
 
-  return JwtService.generate(payload, 'secret');
+  const client = await Client.findOne({ userId: this._id });
+
+  return JwtService.generate(payload, client.secret);
 };
 
 const User = mongoose.model('User', userSchema);

@@ -1,11 +1,13 @@
 const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcryptjs');
-const argon2 = require('argon2');
 
 const { response, responseError, config } = require('../../app/lib/helper');
-const Obj = require('../../app/Helpers/Obj');
+const { Auth } = require('../../app/Http/Middleware/Auth');
 const User = require('../../app/Models/User');
+const Obj = require('../../app/Helpers/Obj');
+
+router.use(Auth);
 
 router.get('/', async (req, res) => {
   const users = await User.find({});
@@ -77,7 +79,7 @@ router.put('/:id/change-password', async (req, res) => {
 
   const password = await bcrypt.hash(
     newPassword.toString(),
-    config('app.salt')
+    config('app.saltLength')
   );
 
   const updates = { password };

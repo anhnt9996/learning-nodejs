@@ -1,18 +1,27 @@
 const mongoose = require('mongoose');
+const { config } = require('../app/lib/helper');
 
-exports.init = () => {
-  const ENV = {
-    dbHost: '127.0.0.1',
-    dbPort: '27017',
-    dbName: 'task-app',
-  };
+exports.connect = async () => {
+  try {
+    const MONGOOSE_CONNECTED_STATE = 1;
 
-  mongoose.connect(`mongodb://${ENV.dbHost}:${ENV.dbPort}/${ENV.dbName}`, {
-    useNewUrlParser: true,
-    useCreateIndex: true,
-    useFindAndModify: false,
-    useUnifiedTopology: true,
-  });
+    await mongoose.connect(
+      `mongodb://${config('app.dbHost')}:${config('app.dbPort')}/${config(
+        'app.dbName'
+      )}`,
+      {
+        useNewUrlParser: true,
+        useCreateIndex: true,
+        useFindAndModify: false,
+        useUnifiedTopology: true,
+      }
+    );
 
-  mongoose.on;
+    const readyState = await mongoose.connection.readyState;
+
+    return readyState === MONGOOSE_CONNECTED_STATE;
+  } catch (error) {
+    console.log('Cannot connect to mongodb');
+    return false;
+  }
 };
