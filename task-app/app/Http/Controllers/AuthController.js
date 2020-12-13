@@ -73,7 +73,7 @@ class AuthController {
   }
 
   async changePassword(req, res) {
-    const { userId } = req.body;
+    const { id: userId } = req.params;
 
     const {
       current_password: currentPassword,
@@ -118,6 +118,48 @@ class AuthController {
     await User.update({ _id: userId }, updates);
 
     res.json(response({}, undefined, 'Password changed!'));
+  }
+
+  async logout(req, res) {
+    const { userId } = req.body;
+    const { isLogoutAll } = req.query;
+
+    if (isLogoutAll) {
+      this._logoutAll(userId);
+
+      return res.json(response());
+    }
+
+    const token = await AccessToken.findOne({
+      userId,
+      name: req.accessToken,
+      revoked: false,
+    });
+
+    if (token) {
+      await token.updateOne({ $set: { revoked: true } });
+    }
+
+    res.json(response());
+  }
+
+  async _logoutAll(userId) {
+    const tokens = await AccessToken.find({
+      userId,
+      revoked: false,
+    });
+
+    if (tokens) {
+      await AccessToken.updateMany(
+        {
+          userId,
+          revoked: false,
+        },
+        { $set: { revoked: true } }
+      );
+    }
+
+    return true;
   }
 }
 

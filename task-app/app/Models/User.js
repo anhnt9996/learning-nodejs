@@ -2,8 +2,9 @@ const mongoose = require('mongoose');
 const validator = require('validator');
 const bcrypt = require('bcryptjs');
 
-const { config } = require('../lib/helper');
 const JwtService = require('../Services/JwtService');
+const { config } = require('../lib/helper');
+const Obj = require('../Helpers/Obj');
 const Client = require('./Client');
 
 const userSchema = new mongoose.Schema({
@@ -62,6 +63,30 @@ userSchema.methods.token = async function () {
   const client = await Client.findOne({ userId: this._id });
 
   return JwtService.generate(payload, client.secret);
+};
+
+userSchema.methods.profile = async function (withTasks = false) {
+  const user = Obj.only(this, ['id', 'name']);
+  if (withTasks) {
+    return {
+      ...user,
+      tasks: await this.getTasks(),
+    };
+  }
+
+  return user;
+};
+
+userSchema.virtual('tasks', {
+  ref: 'Task',
+  localField: '_id',
+  foreignField: 'userId',
+});
+
+userSchema.methods.getTasks = async function () {
+  await this.populate('tasks').execPopulate();
+
+  return await Promise.all(this.tasks.map(async (task) => await task.detail()));
 };
 
 const User = mongoose.model('User', userSchema);

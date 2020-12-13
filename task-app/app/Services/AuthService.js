@@ -1,18 +1,22 @@
 const AccessToken = require('../Models/AccessToken');
+const { empty } = require('../lib/helper');
 const JwtService = require('./JwtService');
 const Obj = require('../Helpers/Obj');
-const { empty } = require('../lib/helper');
+const User = require('../Models/User');
 
 class AuthService {
   static async authorized(accessToken) {
     const userId = Obj.only(JwtService.decode(accessToken), 'userId');
+    const user = await User.findById(userId);
 
-    if (empty(userId)) {
+    if (!user) {
       return false;
     }
+
     const token = await AccessToken.findOne({
       name: accessToken,
       userId,
+      revoked: false,
     });
 
     const now = new Date().getTime();
@@ -26,7 +30,7 @@ class AuthService {
       return false;
     }
 
-    return true;
+    return user;
   }
 }
 

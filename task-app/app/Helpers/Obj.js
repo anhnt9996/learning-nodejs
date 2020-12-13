@@ -1,26 +1,26 @@
 const { empty } = require('../lib/helper');
 
 class Obj {
-  static only(object, keys) {
+  only(object, keys) {
     if (empty(object) || empty(keys)) {
       return {};
     }
 
     let result = {};
-    const parseKeys = objRef.changeKeyName(keys);
+    const parseKeys = this._changeKeyName(keys);
     if (typeof keys === 'string') {
       return (result[parseKeys.parsedName] = object[parseKeys.name] || {});
     }
 
     parseKeys.forEach((key) => {
-      if (object[key.name]) {
+      if (!empty(object[key.name])) {
         result[key.parsedName] = object[key.name];
       }
     });
     return result;
   }
 
-  static except(object, keys) {
+  except(object, keys) {
     if (empty(object) || empty(keys)) {
       return {};
     }
@@ -38,28 +38,26 @@ class Obj {
 
     return object;
   }
+
+  _changeKeyName(keys) {
+    if (typeof keys === 'string') {
+      const explodeKey = keys.split(':');
+
+      return {
+        name: explodeKey[0],
+        parsedName: explodeKey[1] || explodeKey[0],
+      };
+    }
+
+    return keys.map((key) => {
+      const explodeKey = key.split(':');
+
+      return {
+        name: explodeKey[0],
+        parsedName: explodeKey[1] || explodeKey[0],
+      };
+    });
+  }
 }
 
-Obj.prototype.changeKeyName = (keys) => {
-  if (typeof keys === 'string') {
-    const explodeKey = keys.split(':');
-
-    return {
-      name: explodeKey[0],
-      parsedName: explodeKey[1] || explodeKey[0],
-    };
-  }
-
-  return keys.map((key) => {
-    const explodeKey = key.split(':');
-
-    return {
-      name: explodeKey[0],
-      parsedName: explodeKey[1] || explodeKey[0],
-    };
-  });
-};
-
-const objRef = new Obj();
-
-module.exports = Obj;
+module.exports = new Obj();

@@ -2,8 +2,14 @@ const mongoose = require('mongoose');
 
 const accessTokenSchema = new mongoose.Schema(
   {
-    userId: { type: String, index: true },
-    clientId: { type: String, index: true },
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      index: true,
+    },
+    clientId: {
+      type: mongoose.Schema.Types.ObjectId,
+      index: true,
+    },
     name: String,
     revoked: { type: Boolean, default: false },
     expiresAt: Number,

@@ -1,7 +1,10 @@
 const mongoose = require('mongoose');
 
 const clientSchema = new mongoose.Schema({
-  userId: { type: String, index: true },
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    index: true,
+  },
   secret: { type: String, maxlength: 100 },
 });
 

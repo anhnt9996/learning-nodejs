@@ -6,7 +6,11 @@ class UserController {
   async index(req, res) {
     const users = await User.find({});
 
-    res.json(response(users.map((user) => Obj.only(user, ['id', 'name']))));
+    const listUser = await Promise.all(
+      users.map(async (user) => await user.profile())
+    );
+
+    res.json(response(listUser));
   }
 
   async show(req, res) {
@@ -20,7 +24,21 @@ class UserController {
         .json(responseError(404, `Cannot find user #${id}`));
     }
 
-    res.json(response(Obj.only(user, ['id', 'name'])));
+    res.json(response(await user.profile()));
+  }
+
+  async getTasks(req, res) {
+    const { id } = req.params;
+
+    const user = await User.findById(id);
+
+    if (!user) {
+      return res
+        .status(404)
+        .json(responseError(404, `Cannot find user #${id}`));
+    }
+
+    res.json(response(await user.profile(true)));
   }
 
   async update(req, res) {
@@ -38,7 +56,7 @@ class UserController {
 
     await User.update({ _id: id }, updates, { runValidators: true });
 
-    res.json(response(Obj.only(user, ['id', 'name'])));
+    res.json(response(user.profile()));
   }
 }
 
