@@ -4,44 +4,12 @@ const router = express.Router();
 const { response, responseError } = require('../../app/lib/helper');
 const { Auth } = require('../../app/Http/Middleware/Auth');
 const Task = require('../../app/Models/Task');
+const TaskController = require('../../app/Http/Controllers/TaskController');
 
 router.use(Auth);
 
-router.post('/', async (req, res) => {
-  const taskModel = new Task(req.body);
-
-  try {
-    const task = await taskModel.save();
-
-    res.status(201).json(
-      response(
-        {
-          id: task._id,
-          title: task.title,
-          description: task.description,
-        },
-        201
-      )
-    );
-  } catch (error) {
-    res.status(422).json(responseError(422, error.message));
-  }
-});
-
-router.get('/', async (req, res) => {
-  const tasks = await Task.find({});
-
-  res.json(
-    response(
-      tasks.map((task) => ({
-        id: task._id,
-        title: task.title,
-        description: task.description,
-        isCompleted: task.isCompleted,
-      }))
-    )
-  );
-});
+router.get('/', TaskController.index);
+router.post('/', TaskController.create);
 
 router.get('/:id', async (req, res) => {
   const { id } = req.params;

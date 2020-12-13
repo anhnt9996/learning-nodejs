@@ -7,16 +7,16 @@ class Obj {
     }
 
     let result = {};
+    const parseKeys = objRef.changeKeyName(keys);
     if (typeof keys === 'string') {
-      return (result[keys] = object[keys] || {});
+      return (result[parseKeys.parsedName] = object[parseKeys.name] || {});
     }
 
-    keys.forEach((key) => {
-      if (object[key]) {
-        result[key] = object[key];
+    parseKeys.forEach((key) => {
+      if (object[key.name]) {
+        result[key.parsedName] = object[key.name];
       }
     });
-
     return result;
   }
 
@@ -39,5 +39,27 @@ class Obj {
     return object;
   }
 }
+
+Obj.prototype.changeKeyName = (keys) => {
+  if (typeof keys === 'string') {
+    const explodeKey = keys.split(':');
+
+    return {
+      name: explodeKey[0],
+      parsedName: explodeKey[1] || explodeKey[0],
+    };
+  }
+
+  return keys.map((key) => {
+    const explodeKey = key.split(':');
+
+    return {
+      name: explodeKey[0],
+      parsedName: explodeKey[1] || explodeKey[0],
+    };
+  });
+};
+
+const objRef = new Obj();
 
 module.exports = Obj;
