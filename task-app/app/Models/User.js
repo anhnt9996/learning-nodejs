@@ -86,7 +86,7 @@ userSchema.virtual('tasks', {
 userSchema.methods.getTasks = async function () {
   await this.populate('tasks').execPopulate();
 
-  return await Promise.all(this.tasks.map(async (task) => await task.detail()));
+  return await Promise.all(this.tasks.map((task) => task.detail()));
 };
 
 const User = mongoose.model('User', userSchema);

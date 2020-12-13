@@ -6,9 +6,7 @@ class UserController {
   async index(req, res) {
     const users = await User.find({});
 
-    const listUser = await Promise.all(
-      users.map(async (user) => await user.profile())
-    );
+    const listUser = await Promise.all(users.map((user) => user.profile()));
 
     res.json(response(listUser));
   }
