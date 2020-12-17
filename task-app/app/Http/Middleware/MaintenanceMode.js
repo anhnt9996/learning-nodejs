@@ -1,6 +1,6 @@
 const { responseError } = require('../../lib/helper');
 
-exports.MaintenanceMode = (req, res, next) => {
+module.exports = (req, res, next) => {
   const maintenanceMode = process.env.NODE_MAINTENANCE_MODE || 'off';
 
   if (maintenanceMode === 'on') {

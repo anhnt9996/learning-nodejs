@@ -6,34 +6,51 @@ const JwtService = require('../Services/JwtService');
 const { config } = require('../lib/helper');
 const Obj = require('../Helpers/Obj');
 const Client = require('./Client');
+const Task = require('./Task');
+const AccessToken = require('./AccessToken');
 
-const userSchema = new mongoose.Schema({
-  username: {
-    type: String,
-    trim: true,
-    required: true,
-  },
-  name: {
-    type: String,
-    trim: true,
-    required: true,
-  },
-  password: {
-    type: String,
-    required: true,
-    trim: true,
-    validate(value) {
-      if (validator.contains(value, 'password')) {
-        throw new Error('Password must not contain "password!');
-      }
+const userSchema = new mongoose.Schema(
+  {
+    username: {
+      type: String,
+      trim: true,
+      required: true,
+    },
+    name: {
+      type: String,
+      trim: true,
+      required: true,
+    },
+    password: {
+      type: String,
+      required: true,
+      trim: true,
+      validate(value) {
+        if (validator.contains(value, 'password')) {
+          throw new Error('Password must not contain "password!');
+        }
+      },
     },
   },
-});
+  {
+    timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' },
+  }
+);
 
 userSchema.pre('save', async function (next) {
   if (this.isModified('password')) {
     this.password = await bcrypt.hash(this.password, config('app.saltLength'));
   }
+
+  next();
+});
+
+userSchema.pre('remove', async function (next) {
+  await Promise.all([
+    Task.deleteMany({ user_id: this._id }),
+    Client.deleteMany({ user_id: this._id }),
+    AccessToken.deleteMany({ user_id: this._id }),
+  ]);
 
   next();
 });
@@ -56,11 +73,11 @@ userSchema.statics.findByCredentials = async function (
 
 userSchema.methods.token = async function () {
   const payload = {
-    userId: this._id.toString(),
+    user_id: this._id.toString(),
     name: this.name,
   };
 
-  const client = await Client.findOne({ userId: this._id });
+  const client = await Client.findOne({ user_id: this._id });
 
   return JwtService.generate(payload, client.secret);
 };
@@ -80,7 +97,7 @@ userSchema.methods.profile = async function (withTasks = false) {
 userSchema.virtual('tasks', {
   ref: 'Task',
   localField: '_id',
-  foreignField: 'userId',
+  foreignField: 'user_id',
 });
 
 userSchema.methods.getTasks = async function () {

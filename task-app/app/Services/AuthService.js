@@ -6,8 +6,8 @@ const User = require('../Models/User');
 
 class AuthService {
   static async authorized(accessToken) {
-    const userId = Obj.only(JwtService.decode(accessToken), 'userId');
-    const user = await User.findById(userId);
+    const user_id = Obj.only(JwtService.decode(accessToken), 'user_id');
+    const user = await User.findById(user_id);
 
     if (!user) {
       return false;
@@ -15,7 +15,7 @@ class AuthService {
 
     const token = await AccessToken.findOne({
       name: accessToken,
-      userId,
+      user_id,
       revoked: false,
     });
 

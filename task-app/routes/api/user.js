@@ -8,9 +8,10 @@ const Auth = require('../../app/Http/Middleware/Auth');
 router.use(Auth);
 
 router.get('/', UserController.index);
-router.get('/:id', UserController.show);
-router.put('/:id', UserController.update);
-router.put('/:id/change-password', AuthController.changePassword);
-router.get('/:id/tasks', UserController.getTasks);
+router.get('/profile', UserController.show);
+router.put('/', UserController.update);
+router.delete('/', UserController.delete);
+router.put('/change-password', AuthController.changePassword);
+router.get('/profile/tasks', UserController.getTasks);
 
 module.exports = router;

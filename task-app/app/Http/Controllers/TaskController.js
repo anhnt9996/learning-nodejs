@@ -4,15 +4,16 @@ const Obj = require('../../Helpers/Obj');
 
 class TaskController {
   async index(req, res) {
-    const tasks = await Task.find({});
+    const { user } = req;
+    const tasks = await Task.find({ user_id: user._id });
 
-    res.json(response(tasks.map((task) => task.detail())));
+    res.json(response(await Promise.all(tasks.map((task) => task.detail()))));
   }
 
   async create(req, res) {
     const taskModel = new Task({
       ...req.body,
-      userId: req.user.id,
+      user_id: req.user.id,
     });
 
     try {
@@ -29,7 +30,7 @@ class TaskController {
   async show(req, res) {
     const { id } = req.params;
 
-    const task = await Task.findOne({ _id: id, userId: req.user._id });
+    const task = await Task.findOne({ _id: id, user_id: req.user._id });
 
     if (!task) {
       return res
@@ -58,7 +59,7 @@ class TaskController {
     const { id } = req.params;
 
     try {
-      const task = await Task.findById(id);
+      const task = await Task.findOne({ _id: id, user_id: req.user._id });
 
       if (!task) {
         return res
@@ -68,11 +69,11 @@ class TaskController {
 
       await Task.update(
         { _id: id },
-        { isCompleted: !task.isCompleted },
+        { is_completed: !task.is_completed },
         { runValidators: true }
       );
 
-      res.json(response(task.detail()));
+      res.json(response(await task.detail()));
     } catch (error) {
       res.status(500).json(responseError(500, error.message));
     }
@@ -82,7 +83,10 @@ class TaskController {
     const { id } = req.params;
 
     try {
-      const task = await Task.findByIdAndDelete(id);
+      const task = await Task.findOneAndDelete({
+        _id: id,
+        user_id: req.user._id,
+      });
 
       if (!task) {
         return res

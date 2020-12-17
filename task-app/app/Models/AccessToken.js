@@ -2,11 +2,11 @@ const mongoose = require('mongoose');
 
 const accessTokenSchema = new mongoose.Schema(
   {
-    userId: {
+    user_id: {
       type: mongoose.Schema.Types.ObjectId,
       index: true,
     },
-    clientId: {
+    client_id: {
       type: mongoose.Schema.Types.ObjectId,
       index: true,
     },

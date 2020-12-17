@@ -5,7 +5,7 @@ const db = require('./database/mongoose');
 
 const { config } = require('./app/lib/helper');
 const apiRouter = require('./routes/api');
-const { MaintenanceMode } = require('./app/Http/Middleware/MaintenanceMode');
+const MaintenanceMode = require('./app/Http/Middleware/MaintenanceMode');
 
 (async () => {
   await bootstrap.init();

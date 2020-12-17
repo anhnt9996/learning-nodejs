@@ -13,10 +13,11 @@ class Obj {
     }
 
     parseKeys.forEach((key) => {
-      if (!empty(object[key.name])) {
+      if (!empty(object[key.name].toString())) {
         result[key.parsedName] = object[key.name];
       }
     });
+
     return result;
   }
 
