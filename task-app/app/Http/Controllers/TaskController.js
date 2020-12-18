@@ -1,11 +1,26 @@
-const { responseError, response } = require('../../lib/helper');
+const { responseError, response, config } = require('../../lib/helper');
+const PaginateService = require('../../Services/PaginateService');
 const Task = require('../../Models/Task');
 const Obj = require('../../Helpers/Obj');
 
 class TaskController {
   async index(req, res) {
-    const { user } = req;
-    const tasks = await Task.find({ user_id: user._id });
+    const { user, query } = req;
+
+    const conditions = {
+      user_id: user._id,
+    };
+
+    if (query.is_completed) {
+      conditions.is_completed = query.is_completed == 1;
+    }
+
+    const options = {
+      limit: PaginateService.getLimit(query.limit),
+      skip: PaginateService.getSkip(query.page, query.limit),
+    };
+
+    const tasks = await Task.find(conditions, undefined, options);
 
     res.json(response(await Promise.all(tasks.map((task) => task.detail()))));
   }
@@ -39,20 +54,6 @@ class TaskController {
     }
 
     return res.json(response(await task.detail()));
-  }
-
-  async getUser(req, res) {
-    const { id } = req.params;
-
-    const task = await Task.findById(id);
-
-    if (!task) {
-      return res
-        .status(404)
-        .json(responseError(404, `Cannot find task #${id}`));
-    }
-
-    return res.json(response(await task.detail(true)));
   }
 
   async update(req, res) {

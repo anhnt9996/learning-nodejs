@@ -86,3 +86,7 @@ exports.randString = (length = 6) => {
 
   return result;
 };
+
+exports.env = (key, value = null) => {
+  return process.env[key] || value;
+};

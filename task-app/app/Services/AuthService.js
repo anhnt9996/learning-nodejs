@@ -1,5 +1,4 @@
 const AccessToken = require('../Models/AccessToken');
-const { empty } = require('../lib/helper');
 const JwtService = require('./JwtService');
 const Obj = require('../Helpers/Obj');
 const User = require('../Models/User');

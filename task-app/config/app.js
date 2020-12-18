@@ -1,11 +1,17 @@
+const { env } = require('../app/lib/helper');
+
 const app = {
-  apiVersion: process.env.API_VERSION || 1,
-  port: process.env.PORT || 3000,
-  saltLength: process.env.SALT || 8,
-  maintenanceMode: process.env.NODE_MAINTENANCE_MODE || 'off',
-  dbHost: '127.0.0.1',
-  dbPort: '27017',
-  dbName: 'task-app',
+  apiVersion: env('APP_API_VERSION', 1),
+  port: env('APP_PORT', 3000),
+  saltLength: 8,
+  maintenanceMode: env('APP_MAINTENANCE_MODE', 'off'),
+  dbHost: env('DB_HOST'),
+  dbPort: env('DB_PORT'),
+  dbName: env('DB_DATABASE'),
+  paginate: {
+    limit: 15,
+    skip: 0,
+  },
 };
 
 module.exports = app;

@@ -9,7 +9,6 @@ router.use(Auth);
 router.get('/', TaskController.index);
 router.post('/', TaskController.create);
 router.get('/:id', TaskController.show);
-router.get('/:id/user', TaskController.getUser);
 router.put('/:id', TaskController.update);
 router.delete('/:id', TaskController.delete);
 

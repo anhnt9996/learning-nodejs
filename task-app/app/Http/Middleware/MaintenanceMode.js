@@ -1,7 +1,7 @@
-const { responseError } = require('../../lib/helper');
+const { responseError, config } = require('../../lib/helper');
 
 module.exports = (req, res, next) => {
-  const maintenanceMode = process.env.NODE_MAINTENANCE_MODE || 'off';
+  const maintenanceMode = config('app.maintenanceMode');
 
   if (maintenanceMode === 'on') {
     return res.status(503).json(responseError(503, 'Under maintenance!'));

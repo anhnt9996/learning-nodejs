@@ -1,10 +1,13 @@
 const path = require('path');
 const glob = require('glob');
 
+require('dotenv').config();
+
 const CONFIG_PATH = path.join(__dirname, '../config');
 
 class App {
   appConfigs = {};
+  env = {};
 
   async init() {
     this.loadConfigFiles(`${CONFIG_PATH}/*.js`, this.appConfigs);
