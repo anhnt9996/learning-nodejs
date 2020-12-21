@@ -3,19 +3,23 @@ const { config } = require('../app/lib/helper');
 
 exports.connect = async () => {
   try {
+    const database = config('database.connections.mongodb');
     const MONGOOSE_CONNECTED_STATE = 1;
+
     console.log('Connecting to DB');
-    await mongoose.connect(
-      `mongodb://${config('app.dbHost')}:${config('app.dbPort')}/${config(
-        'app.dbName'
-      )}`,
-      {
-        useNewUrlParser: true,
-        useCreateIndex: true,
-        useFindAndModify: false,
-        useUnifiedTopology: true,
-      }
-    );
+    const uri = `mongodb://${database.host}:${database.port}/${database.database}`;
+
+    await mongoose.connect(uri, {
+      auth: {
+        authSource: 'admin',
+      },
+      user: database.username,
+      pass: database.password,
+      useNewUrlParser: true,
+      useCreateIndex: true,
+      useFindAndModify: false,
+      useUnifiedTopology: true,
+    });
 
     const readyState = await mongoose.connection.readyState;
     console.log('Connect completed');

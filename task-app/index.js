@@ -1,20 +1,13 @@
 const express = require('express');
 
 const bootstrap = require('./bootstrap/app');
-const db = require('./database/mongoose');
+const db = require('./database');
 
 const { config } = require('./app/lib/helper');
 const apiRouter = require('./routes/api');
 const MaintenanceMode = require('./app/Http/Middleware/MaintenanceMode');
 
-(async () => {
-  await bootstrap.init();
-  const dbConnected = await db.connect();
-
-  if (!dbConnected) {
-    return console.log('Cannot start application');
-  }
-
+const startApp = () => {
   const PORT = config('app.port');
 
   const app = express();
@@ -28,4 +21,16 @@ const MaintenanceMode = require('./app/Http/Middleware/MaintenanceMode');
   app.use(`/api/v${config('app.apiVersion')}`, apiRouter);
 
   app.listen(PORT, () => console.log(`Listening on port ${PORT}`));
+};
+
+(async () => {
+  try {
+    await bootstrap.init();
+    await db.connect();
+
+    startApp();
+  } catch (error) {
+    console.log(error.message);
+    console.log('Failed to start application');
+  }
 })();
